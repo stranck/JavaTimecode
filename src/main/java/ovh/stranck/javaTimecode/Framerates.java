@@ -35,5 +35,8 @@ public enum Framerates {
     public float getFps(){
     	return fps;
     }
+	public int getIntegerFramerate(){
+		return (int) Math.ceil(fps);
+	}
 }
 

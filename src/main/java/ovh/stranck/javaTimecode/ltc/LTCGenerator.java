@@ -6,8 +6,12 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
 
+import ovh.stranck.javaTimecode.TimecodePlayer;
+import ovh.stranck.javaTimecode.Wait;
+
 public class LTCGenerator implements Runnable {
-	private volatile boolean autoIncrement = true;
+    private volatile float bufferCapacity = 0.5f;
+	private volatile TimecodePlayer tcPlayer;
     private volatile LTCPacket packet;
 	
     private SourceDataLine dataLine;
@@ -18,7 +22,7 @@ public class LTCGenerator implements Runnable {
 	public LTCGenerator(Mixer output, int sampleRate) throws LineUnavailableException{
 		this.mixer = output;
 		this.sampleRate = sampleRate;
-		packet = new LTCPacket();
+		setPacket(new LTCPacket());
 		
 		AudioFormat format = new AudioFormat(sampleRate, 8, 1, true, true);
         SourceDataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
@@ -29,19 +33,17 @@ public class LTCGenerator implements Runnable {
 
 	public void run() {
 		byte[] content;
-		long ms = System.currentTimeMillis() + (long)packet.getFrameWindow(), currentMs;
+		tcPlayer.updateStartPoint();
 		while(!Thread.interrupted()){
-			content = packet.asAudioSample(sampleRate);
-			dataLine.write(content, 0, content.length);
-			
-			currentMs = System.currentTimeMillis();
-			if(autoIncrement && currentMs >= ms){
-				System.out.println(packet/* + " " + packet.asBitsString()*/);
-				packet.nextFrame();
-				ms = currentMs + (long)packet.getFrameWindow();
+			if(dataLine.getBufferSize() * bufferCapacity < dataLine.available()){
+				tcPlayer.updateTimecodeTime();
+				content = packet.asAudioSample(sampleRate);
+				dataLine.write(content, 0, content.length);
+				System.out.println(packet);
 			}
+			Wait.wait(1);
 		}
-		System.out.println("Exit");
+		dataLine.drain();
 	}
 	
 	public void start(){
@@ -58,19 +60,25 @@ public class LTCGenerator implements Runnable {
         mixer.close();
 	}
 	
+	public LTCGenerator setBufferDimension(float dimension){
+		bufferCapacity = dimension;
+		return this;
+	}
+	public float getCustomBufferDimension(){
+		return bufferCapacity;
+	}
+	public int getRealBufferDimension(){
+		return dataLine.getBufferSize();
+	}
 	public LTCGenerator setPacket(LTCPacket packet){
 		this.packet = packet;
+		tcPlayer = packet.getTimecodePlayer();
 		return this;
 	}
 	public LTCPacket getPacket(){
 		return packet;
 	}
-	public LTCGenerator setAutoIncrement(boolean autoIncrement){
-		this.autoIncrement = autoIncrement;
-		return this;
+	public TimecodePlayer getTimecodePlayer(){
+		return tcPlayer;
 	}
-	public boolean isAutoIncrementing(){
-		return autoIncrement;
-	}
-	
 }

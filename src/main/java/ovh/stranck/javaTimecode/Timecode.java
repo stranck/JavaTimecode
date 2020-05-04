@@ -1,6 +1,7 @@
 package ovh.stranck.javaTimecode;
 
-public abstract class Timecode {
+public abstract class Timecode {	
+	protected TimecodePlayer tcPlayer;
 	protected int hours;
 	protected int mins;
 	protected int secs;
@@ -12,15 +13,13 @@ public abstract class Timecode {
 	
 	public Timecode(int hour, int min, int sec, int frame, Framerates framerate){
 		this.framerate = framerate;
+		tcPlayer = new TimecodePlayer(this);
 		setTime(hour, min, sec, frame);
+		tcPlayer.updateStartPoint();
 	}
 	
-	protected int getIntegerFramerate(){
-		return (int) Math.ceil(framerate.getFps());
-	}
-	
-	protected final void sanityzeTime(){
-		int fps = getIntegerFramerate();
+	protected final void sanityzeTime(boolean updateStartPoint){
+		int fps = framerate.getIntegerFramerate();
 		secs += frames / fps;
 		frames %= fps;
 		if(frames < 0) {
@@ -43,19 +42,26 @@ public abstract class Timecode {
 		if(hours < 0){
 			hours = 24 - hours;
 		}
+		if(updateStartPoint)
+			tcPlayer.updateStartPoint();
 	}
 	
 	public int getTotalFrames(){
 		int n = hours;
 		n = 60 * n + mins;
 		n = 60 * n + secs;
-		n = getIntegerFramerate() * n + frames;
+		n = framerate.getIntegerFramerate() * n + frames;
 		return n;
+	}
+	void setTimeWithoutUpdatingStartPoint(int totalFrames){
+		hours = mins = secs = 0;
+		frames = totalFrames;
+		sanityzeTime(false);
 	}
 	public Timecode setTime(int totalFrames){
 		hours = mins = secs = 0;
 		frames = totalFrames;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	public Timecode setTime(int hours, int mins, int secs, int frames){
@@ -63,7 +69,7 @@ public abstract class Timecode {
 		this.mins = mins;
 		this.secs = secs;
 		this.frames = frames;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	
@@ -72,17 +78,17 @@ public abstract class Timecode {
 	}
 	public Timecode setHours(int hours) {
 		this.hours = hours;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	public Timecode nextHour(){
 		hours++;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	public Timecode previousHour(){
 		hours--;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	public int getMins() {
@@ -90,17 +96,17 @@ public abstract class Timecode {
 	}
 	public Timecode setMins(int mins) {
 		this.mins = mins;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	public Timecode nextMin(){
 		mins++;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	public Timecode previousMin(){
 		mins--;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	public int getSecs() {
@@ -108,17 +114,17 @@ public abstract class Timecode {
 	}
 	public Timecode setSecs(int secs) {
 		this.secs = secs;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	public Timecode nextSec(){
 		secs++;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	public Timecode previousSec(){
 		secs--;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	public int getFrames() {
@@ -126,17 +132,17 @@ public abstract class Timecode {
 	}
 	public Timecode setFrames(int frames) {
 		this.frames = frames;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	public Timecode nextFrame(){
 		frames++;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	public Timecode previousFrame(){
 		frames--;
-		sanityzeTime();
+		sanityzeTime(true);
 		return this;
 	}
 	public Framerates getFramerate() {
@@ -147,6 +153,9 @@ public abstract class Timecode {
 		this.framerate = framerate;
 		setTime(totalFrames);
 		return this;
+	}
+	public TimecodePlayer getTimecodePlayer(){
+		return tcPlayer;
 	}
 	public float getFrameWindow(){
 		return 1000 / framerate.getFps();

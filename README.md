@@ -4,14 +4,18 @@ MTC and LTC timecode generator library in Java
 **NOTE:** The library is still a wip.
 
 ## What's working:
-- LTC generator (Except it has a weird buffer problem, but it's almost fixed)
+- LTC generator
 - Timecode data managment 
+- Timecode set fields
+- TimecodePlayer to choose timecode offset + speed (and, consequently, also direction)
 
 ## TODO list:
 - ALL of the MTC part
-- fix audio buffer managment for LTC generator
 - Write a timecode reader for both MTC and LTC
-- Write a Timecode wrapper that will automatically set framens 'n stuff based of time, speed and direction
+- Changing audio output method to something more real time (now "real time" is garanted by just reducing the buffer size lmao)
+- 44.1khz support (But I think this will be done together with the previous point)
+- Writing docs (sigh)
+- Writing an example/test
 
 ### The idea
 
