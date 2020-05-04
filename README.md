@@ -3,6 +3,10 @@ MTC and LTC timecode generator library in Java
 
 **NOTE:** The library is still a wip.
 
+## What's working:
+- LTC generator (Except it has a weird buffer problem, but it's almost fixed)
+- Timecode data managment 
+
 ## TODO list:
 - ALL of the MTC part
 - fix audio buffer managment for LTC generator
