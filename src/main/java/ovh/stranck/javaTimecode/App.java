@@ -1,0 +1,26 @@
+package ovh.stranck.javaTimecode;
+
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.Mixer;
+
+import ovh.stranck.javaTimecode.ltc.LTCGenerator;
+
+public class App {
+	public static void main(String[] args) throws LineUnavailableException {
+		Mixer m = Utils.getMixer("*Realtek High Definition Audio*");
+		System.out.println(m.getMixerInfo());
+		LTCGenerator ltc = new LTCGenerator(m, 48000);
+		System.out.println("starting");
+		ltc.start();
+		Wait.wait(1000);
+		System.out.println("stopping");
+		ltc.stop();
+		Wait.wait(10000);
+		/*System.out.println("starting");
+		ltc.start();
+		Wait.wait(10000);
+		System.out.println("stopping");
+		ltc.stop();
+		Wait.wait(10000);*/
+	}
+}
