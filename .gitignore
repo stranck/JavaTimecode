@@ -1,6 +1,18 @@
-/target/
+# IntelliJ IDEA files
+JavaTimecode.iml
+.idea/
+
+# Build directory
+target/
+out/
+
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
 /.settings/
-/.git/
 .classpath
 .project
 pom.xml
