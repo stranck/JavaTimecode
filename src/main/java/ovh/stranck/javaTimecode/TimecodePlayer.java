@@ -16,11 +16,13 @@ public class TimecodePlayer {
 		setSpeed(speed);
 	}
 	
-	public synchronized TimecodePlayer updateTimecodeTime(){
+	public int convertToFrames(int value){
+		return (int) (value * speed * t.getFramerate().getIntegerFramerate() / 1000 + zFrame + offset);
+	}
+	public synchronized TimecodePlayer updateTimecodeTime(int msOffset){
 		if(playing){
 			//System.out.println((System.currentTimeMillis() - zMs) + " ");
-			t.setTimeWithoutUpdatingStartPoint((int) ((System.currentTimeMillis() - zMs)
-				* speed * t.getFramerate().getIntegerFramerate() / 1000 + zFrame + offset));
+			t.setTimeWithoutUpdatingStartPoint(convertToFrames((int) (System.currentTimeMillis() - zMs + msOffset)));
 		}
 		return this;
 	}

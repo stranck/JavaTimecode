@@ -10,6 +10,7 @@ public abstract class Timecode {
 	
 	public abstract byte[] asByteArray();
 	public abstract String asBitsString();
+	public abstract int getPacketSize(Object o);
 	
 	public Timecode(int hour, int min, int sec, int frame, Framerates framerate){
 		this.framerate = framerate;
@@ -142,6 +143,11 @@ public abstract class Timecode {
 	}
 	public Timecode previousFrame(){
 		frames--;
+		sanityzeTime(true);
+		return this;
+	}
+	public Timecode addFrames(int frames){
+		this.frames += frames;
 		sanityzeTime(true);
 		return this;
 	}

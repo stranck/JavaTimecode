@@ -12,7 +12,6 @@ MTC and LTC timecode generator library in Java
 ## TODO list:
 - ALL of the MTC part
 - Write a timecode reader for both MTC and LTC
-- Changing audio output method to something more real time (now "real time" is garanted by just reducing the buffer size lmao)
 - 44.1khz support (But I think this will be done together with the previous point)
 - Writing docs (sigh)
 - Writing an example/test

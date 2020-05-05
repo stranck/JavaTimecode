@@ -70,8 +70,7 @@ public class LTCPacket extends Timecode {
 		return data;
 	}
 	public byte[] asAudioSample(int sampleRate){
-		int repeat = (int) (sampleRate / (160 * framerate.getFps()));
-		return manchesterEncode(asBooleanArray(), repeat);
+		return manchesterEncode(asBooleanArray(), getBitExpansion(sampleRate));
 	}
 	@Override
 	public byte[] asByteArray() {
@@ -85,6 +84,14 @@ public class LTCPacket extends Timecode {
 			sb.append(b ? '1' : '0');
 
 		return sb.toString();
+	}
+	@Override
+	public int getPacketSize(Object o){
+		return 160 * getBitExpansion((Integer) o);
+	}
+	
+	private int getBitExpansion(int sampleRate){
+		return (int) (sampleRate / (160 * framerate.getFps()));
 	}
 	
 	private byte[] manchesterEncode(boolean value[], int repeatBytes) {
